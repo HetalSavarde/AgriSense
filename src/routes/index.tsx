@@ -154,13 +154,7 @@ function ResultsLayout({
 
           <RecoveryPlanner data={recovery} />
 
-          <div className="card-elevated p-6">
-            <h4 className="font-display text-lg font-semibold mb-3">
-              Scan another leaf
-            </h4>
-
-            <UploadZone compact onFile={onNewUpload} />
-          </div>
+        
         </section>
       </main>
 
