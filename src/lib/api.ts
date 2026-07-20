@@ -1,37 +1,61 @@
-// Thin API layer. Replace mock returns with real fetch calls to Flask backend.
 import { API_ENDPOINTS } from "@/config/constants";
-import { mockAnalysis, mockRisk, mockRecovery } from "@/data/mockData";
+import { mockRisk, mockRecovery } from "@/data/mockData";
 
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+export async function analyzeLeaf(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
 
-export async function analyzeLeaf(_file: File) {
-  // TODO: replace with real fetch
-  // const fd = new FormData(); fd.append("image", _file);
-  // const res = await fetch(API_ENDPOINTS.analyzeLeaf, { method: "POST", body: fd });
-  // return res.json();
-  await delay(2600);
-  return mockAnalysis;
+  const response = await fetch(API_ENDPOINTS.analyzeLeaf, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Failed to analyze image");
+  }
+
+  const data = await response.json();
+
+  // Convert backend response to the format expected by the existing UI
+  return {
+    diseaseName: data.predicted_class.replace(/___/g, " "),
+    confidence: Number((data.confidence * 100).toFixed(1)),
+    severity: data.report.severity,
+    recoveryTime: `${data.report.estimated_recovery_days} days`,
+    symptoms: data.report.symptoms,
+    causes: data.report.causes,
+    treatment: data.report.treatment,
+    prevention: data.report.prevention,
+    top3: data.top3,
+    nextSteps: data.report.next_steps,
+  };
 }
 
 export async function fetchRisk() {
-  await delay(400);
+  // Keep mock data until Risk Team API is ready
   return mockRisk;
 }
 
 export async function fetchRecovery() {
-  await delay(400);
+  // Keep mock data until Recovery Team API is ready
   return mockRecovery;
 }
 
-export async function sendChatMessage(message: string, context?: { disease?: string }) {
-  // const res = await fetch(API_ENDPOINTS.chat, { method: "POST", body: JSON.stringify({ message, context }) });
-  await delay(900);
+export async function sendChatMessage(
+  message: string,
+  context?: { disease?: string }
+) {
+  // Keep mock chat until Chat Team API is ready
   const canned = [
     `For "${context?.disease ?? "your plant"}", the best next step is to isolate and treat with a copper-based fungicide.`,
-    `Great question. Regarding "${message}" — consistency is key. Keep humidity below 65% and inspect daily.`,
-    `Yes — prune the affected leaves, sanitize your shears, and reapply treatment every 7 days.`,
+    `Regarding "${message}" — keep humidity controlled and inspect your plant regularly.`,
+    `Prune affected leaves, sanitize tools, and continue treatment as recommended.`,
   ];
-  return { reply: canned[Math.floor(Math.random() * canned.length)] };
+
+  return {
+    reply: canned[Math.floor(Math.random() * canned.length)],
+  };
 }
 
 export { API_ENDPOINTS };
