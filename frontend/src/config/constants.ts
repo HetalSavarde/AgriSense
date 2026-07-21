@@ -1,5 +1,5 @@
-// Central config for API endpoints. Swap BASE_URL for your Flask backend later.
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
 
 export const API_ENDPOINTS = {
   analyzeLeaf: `${API_BASE_URL}/predict`,
@@ -11,4 +11,6 @@ export const API_ENDPOINTS = {
 } as const;
 
 export const APP_NAME = "LeafDoc AI";
-export const APP_TAGLINE = "AI-powered plant disease detection & recovery";
+
+export const APP_TAGLINE =
+  "AI-powered plant disease detection & recovery";

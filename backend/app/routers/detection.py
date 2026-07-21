@@ -1,18 +1,8 @@
-"""
-Feature owner: Disease Detection
-Endpoint: POST /predict
-
-TODO for owner:
-- Wire up the real image classifier in services/detection_service.py
-- Wire up real report generation (AI call) in the same service
-- This router should stay thin — no business logic here, just request
-  handling and calling the service.
-"""
-
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from app.schemas.detection import DetectionResponse
 from app.services import detection_service
+from app.services.detection_service import DetectionUnavailableError
 
 router = APIRouter()
 
@@ -23,5 +13,13 @@ async def predict(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Please upload an image file")
 
     image_bytes = await file.read()
-    result = detection_service.analyze_leaf(image_bytes)
+    try:
+        result = detection_service.analyze_leaf(image_bytes)
+    except DetectionUnavailableError:
+        raise HTTPException(
+            status_code=503,
+            detail="Detection is temporarily unavailable. Please try again in a moment.",
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to analyze image")
     return result

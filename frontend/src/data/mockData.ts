@@ -56,12 +56,6 @@ export const mockRecovery = {
   ],
 };
 
-export const suggestedQuestions = [
-  "How contagious is this disease?",
-  "Can I still eat the fruits?",
-  "What's the best fungicide brand?",
-  "How do I prevent it next season?",
-];
 
 export const initialChat = [
   {
